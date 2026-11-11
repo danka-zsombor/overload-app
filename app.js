@@ -244,32 +244,41 @@
     $$('.set-group',card).forEach((group,index) => { $('.set-comparisons',group).innerHTML = comparisonRows(name,index); });
     renderCoach(card);
   }
-  function renderCoach(card) {
+    function renderCoach(card) {
     const name = $('.movement-name',card).value.trim();
     const type = $('.movement-type',card).value;
     const pattern = $('.movement-pattern',card).value;
     const { low, high } = type === 'isolation' ? { low:10,high:15 } : { low:6,high:10 };
     const target = $('.coach-advice',card);
     if (!name) { target.innerHTML = ''; return; }
-    const previous = movementSessions(name)[0]?.movement;
-    const sets = previous?.sets || [];
+
+    const previousMovement = movementSessions(name)[0]?.movement;
+    const previousSets = previousMovement?.sets || [];
+    const bump = type === 'isolation' ? 1 : 2.5;
+    const loadChange = pattern === 'independent' ? 'to each dumbbell' : pattern === 'unilateral' ? 'per side' : 'to the total load';
     const unitHint = pattern === 'independent' ? 'per dumbbell' : pattern === 'unilateral' ? 'per side' : 'total load';
-    const sideHint = pattern === 'unilateral' ? 'Log reps for one side, match them on the other side, and use your weaker side to set the target.' : pattern === 'independent' ? 'Enter the weight of one dumbbell. Progress the pair evenly and keep reps matched.' : 'Enter the total working load.';
-    if (!sets.length) {
-      target.innerHTML = `<span class="coach-label">MOVEMENT INTELLIGENCE · ${patternLabel(pattern).toUpperCase()} · ${type.toUpperCase()}</span><p>Start with a controlled load (${unitHint}) for ${low}–${high} reps. ${sideHint} Log a session for personalized progression guidance.</p>`;
-      return;
-    }
-    const allAtTop = sets.every(set => Number(set.reps) >= high);
-    let advice;
-    if (allAtTop) {
-      const bump = type === 'isolation' ? 1 : 2.5;
-      advice = `All ${sets.length} sets reached ${high} reps last time. Try adding ${fmt(bump)} kg ${pattern === 'independent' ? 'to each dumbbell' : pattern === 'unilateral' ? 'per side' : 'to the total load'} next time, then build back toward ${high} reps. ${sideHint}`;
-    } else {
-      advice = `Keep the same load (${unitHint}) and aim for one more rep on each set, stopping at ${high}. Work within the ${low}–${high} rep range. ${sideHint}`;
-    }
-    target.innerHTML = `<span class="coach-label">MOVEMENT INTELLIGENCE · ${patternLabel(pattern).toUpperCase()} · ${type.toUpperCase()} · ${low}–${high} REPS</span><p>${escapeHtml(advice)}</p>`;
+    const setGroups = $$('.set-group',$('.set-list',card));
+    const setAdvice = setGroups.map((group,index) => {
+      const previous = previousSets[index];
+      if (!previous) {
+        return `<p><strong>SET ${index+1}</strong> No matching set was logged last time. Establish a comfortable ${unitHint} for ${low}–${high} reps.</p>`;
+      }
+
+      const reps = Number(previous.reps) || 0;
+      const weight = Number(previous.weight) || 0;
+      if (reps >= high) {
+        return `<p><strong>SET ${index+1}</strong> Last time: ${escapeHtml(fmt(weight))} kg × ${reps} reps. Increase by ${fmt(bump)} kg ${loadChange}; aim for ${low}–${high} reps.</p>`;
+      }
+      if (reps >= low) {
+        const targetReps = Math.min(high,reps+1);
+        return `<p><strong>SET ${index+1}</strong> Last time: ${escapeHtml(fmt(weight))} kg × ${reps} reps. Keep ${escapeHtml(fmt(weight))} kg ${unitHint} and aim for ${targetReps} reps.</p>`;
+      }
+      return `<p><strong>SET ${index+1}</strong> Last time: ${escapeHtml(fmt(weight))} kg × ${reps} reps. Keep the load and build toward ${low}–${high} reps.</p>`;
+    }).join('');
+
+    target.innerHTML = `<span class="coach-label">MOVEMENT INTELLIGENCE · ${patternLabel(pattern).toUpperCase()} · ${type.toUpperCase()} · SET-BY-SET · ${low}–${high} REPS</span>${setAdvice}`;
   }
-  function addMovement(movement = { id:newId(), name:'', sets:[{reps:'',weight:''}] }) {
+function addMovement(movement = { id:newId(), name:'', sets:[{reps:'',weight:''}] }) {
     list.insertAdjacentHTML('beforeend', movementMarkup(movement, $$('.movement-card',list).length));
     reindex(); saveDraft();
     $('.movement-name', list.lastElementChild).focus();
