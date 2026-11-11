@@ -1,4 +1,4 @@
-const CACHE_NAME = 'overload-shell-v4';
+const CACHE_NAME = 'overload-shell-v5';
 const APP_FILES = ['./', './index.html', './styles.css', './app.js', './manifest.json', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
