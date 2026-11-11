@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101a14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Overload">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+  <title>Overload — Training journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-row"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button><a class="brand" href="#top" aria-label="Overload home"><span class="brand-mark">o.</span><span>overload<span class="brand-period">.</span></span></a></div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-item active" href="#workout"><span class="nav-icon"><svg class="plate-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.2"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5v2.8M21.5 12h-2.8M12 21.5v-2.8M2.5 12h2.8"/></svg></span>Log workout</a>
+        <a class="nav-item" href="#history"><span class="nav-icon">▤</span>Workouts</a>
+        <a class="nav-item" href="#trophies"><span class="nav-icon">✦</span>Trophy room</a>
+      </nav>
+    </aside>
+
+    <div class="menu-backdrop" id="menu-backdrop" hidden></div>
+    <aside class="app-menu" id="app-menu" aria-label="App menu" aria-hidden="true" inert>
+      <div class="menu-heading"><span>MENU</span><button id="menu-close" type="button" aria-label="Close menu">×</button></div>
+      <nav class="drawer-nav" aria-label="App pages"><a href="#workout"><svg class="plate-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.2"/><circle cx="12" cy="12" r="2"/><path d="M12 2.5v2.8M21.5 12h-2.8M12 21.5v-2.8M2.5 12h2.8"/></svg> <span>Log workout</span></a><a href="#history">▤ <span>Workouts</span></a><a href="#trophies">✦ <span>Trophy room</span></a><button id="draft-switch" type="button" hidden>↻ <span>Switch to previous draft</span></button></nav>
+      <div class="drawer-workouts-heading"><strong>Previous workouts</strong><span id="menu-workout-count">0</span></div>
+      <div id="menu-workout-list" class="menu-workout-list"></div>
+      <p id="menu-empty" class="menu-empty">Your saved workouts will appear here.</p>
+    </aside>
+
+    <main id="top" class="main-area">
+      <div class="content-grid page-view" id="workout-view">
+        <section class="workout-panel" id="workout" aria-labelledby="workout-heading">
+          <div class="panel-heading"><div><div class="section-kicker"><span class="live-dot"></span> NEW SESSION</div><h2 id="workout-heading">Log a workout</h2></div><div class="panel-actions"><div id="timer-cluster" class="timer-cluster" hidden><div class="main-clock"><span>WORKOUT</span><time id="workout-timer">00:00</time></div><div class="rest-clock"><span>REST</span><time id="rest-timer">00:00</time></div></div><button class="text-button" id="clear-workout" type="button">Clear <span>↻</span></button></div></div>
+          <div class="session-fields">
+            <label class="field-label" for="workout-name">WORKOUT NAME</label>
+            <input id="workout-name" class="workout-title-input" type="text" placeholder="Workout name" maxlength="60" autocomplete="off">
+            <label class="field-label date-label" for="workout-date">DATE</label>
+            <input id="workout-date" class="date-input" type="date">
+          </div>
+          <div class="movement-heading"><div><span class="field-label">MOVEMENTS</span><span id="movement-count" class="count-pill">0</span></div></div>
+          <div id="movement-list" class="movement-list"></div>
+          <button class="add-movement" id="add-movement" type="button"><span class="plus-circle">＋</span><span><strong>Add movement</strong></span><span class="add-arrow">↗</span></button>
+          <label class="field-label notes-label" for="workout-notes">NOTES <span>OPTIONAL</span></label>
+          <textarea id="workout-notes" placeholder="Session notes" rows="2" maxlength="400"></textarea>
+          <div class="save-row"><button class="primary-button" id="save-workout" type="button">Save workout <span>→</span></button></div>
+        </section>
+      </div>
+
+      <section class="history-section page-view" id="history" hidden>
+        <div class="history-heading"><h2>Workouts</h2><span class="history-total" id="history-total">0</span></div>
+        <div class="history-list" id="history-list"></div>
+        <div id="history-empty" class="history-empty"><strong>No workouts yet</strong></div>
+      </section>
+      <section class="trophy-section page-view" id="trophies" aria-labelledby="trophy-heading" hidden>
+        <div class="history-heading"><h2 id="trophy-heading">Trophy room</h2><span class="history-total" id="trophy-total">0 EXERCISES</span></div>
+        <div id="trophy-list" class="trophy-grid"></div>
+        <div id="trophy-empty" class="history-empty"><strong>Log workouts to earn your first PR</strong></div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
